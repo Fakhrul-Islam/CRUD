@@ -8,7 +8,6 @@ class Read{
 		$stm = DB::prepare($sql);
 		$stm->execute();
 		return $stm->fetchAll();
-
 	}
 
 

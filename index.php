@@ -7,6 +7,20 @@ spl_autoload_register(function($class){
 $read = new Read();
 $i = 0;
 
+if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
+	$name = $_POST['name'];
+	$age = $_POST['age'];
+	$profession = $_POST['profession'];
+	$insert = new Insert();
+	$insert->setName($name);
+	$insert->setAge($age);
+	$insert->setProf($profession);
+	$insertData = $insert->insertData();
+	if($insertData){
+		$insertN = 'Data Insert Successfull';
+	}
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +36,8 @@ $i = 0;
 			<div class="myDiv">
 				<div class="myForm col-md-6">
 					<h2 class="text-center">Simple Form</h2>
-					<form action="" class="form"  style = "border-right:1px solid #ddd">
+					<p class="text-success"><?php if(!empty($insertN)){echo $insertN;} ?></p>
+					<form action="index.php" method="POST" class="form">
 						<div class="form-group">
 							<label for="name">Name : </label>
 							<input type="text" name="name" class="form-control" id="name">
