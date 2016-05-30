@@ -26,5 +26,15 @@ class Insert{
 		return $stm->execute();
 	}
 
+	public function update($id){
+		$sql = "UPDATE $this->table SET name=:name,age=:age,profession=:prof WHERE id=:id";
+		$stm = DB::prepare($sql);
+		$stm->bindParam('name',$this->name);
+		$stm->bindParam('age',$this->age);
+		$stm->bindParam('prof',$this->prof);
+		$stm->bindParam('id',$id);
+		return $stm->execute();
+	}
+
 }
 ?>

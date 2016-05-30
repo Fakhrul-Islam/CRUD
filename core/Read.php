@@ -10,6 +10,14 @@ class Read{
 		return $stm->fetchAll();
 	}
 
+	public function readById($id,$table){
+		$sql = 'SELECT * FROM '.$table.' WHERE id = :id';
+		$stm = DB::prepare($sql);
+		$stm->bindParam('id',$id);
+		$stm->execute();
+		return $stm->fetch();
+	}
+
 
 }
 ?>

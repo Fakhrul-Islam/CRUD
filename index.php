@@ -7,10 +7,11 @@ spl_autoload_register(function($class){
 $read = new Read();
 $i = 0;
 
-if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
-	$name = $_POST['name'];
-	$age = $_POST['age'];
-	$profession = $_POST['profession'];
+$name = ( isset($_POST['name']) && !empty($_POST['name']) )?$_POST['name']:'';
+$age = ( isset($_POST['age']) && !empty($_POST['age']) )?$_POST['age']:'';
+$profession = ( isset($_POST['profession']) && !empty($_POST['profession']) )?$_POST['profession']:'';
+
+if( isset($_POST['add']) ){
 	$insert = new Insert();
 	$insert->setName($name);
 	$insert->setAge($age);
@@ -18,9 +19,39 @@ if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
 	$insertData = $insert->insertData();
 	if($insertData){
 		$insertN = 'Data Insert Successfull';
+		header('Location:index.php');
 	}
 }
 
+if( isset($_GET['action']) && $_GET['action']=='edit' ){
+	$id = $_GET['id'];
+	$person = $read->readById($id,'person');
+	$name =  $person['name'];
+	$age =  $person['age'];
+	$profession =  $person['profession'];
+	if(isset($_POST['edit'])){
+		$name = $_POST['name'];
+		$age = $_POST['age'];
+		$profession = $_POST['profession'];
+		$insert = new Insert();
+		$insert->setName($name);
+		$insert->setAge($age);
+		$insert->setProf($profession);
+		$insertData = $insert->update($id);
+		if($insertData){
+			header('Location:index.php');
+		}
+	}
+}
+
+if(isset($_GET['action']) && $_GET['action'] == 'del'){
+	$id = $_GET['id'];
+	$del = new Delete();
+	;
+	if($del->deleteById($id)){
+		header('Location:index.php');
+	}
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,20 +68,23 @@ if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
 				<div class="myForm col-md-6">
 					<h2 class="text-center">Simple Form</h2>
 					<p class="text-success"><?php if(!empty($insertN)){echo $insertN;} ?></p>
-					<form action="index.php" method="POST" class="form">
+					<form action="<?=(isset($_GET['action']))?'index.php?action=edit&id='.$id : 'index.php'; ?>" method="POST" class="form">
 						<div class="form-group">
 							<label for="name">Name : </label>
-							<input type="text" name="name" class="form-control" id="name">
+							<input value="<?=$name; ?>" type="text" name="name" class="form-control" id="name">
 						</div>
 						<div class="form-group">
 							<label for="age">Age : </label>
-							<input type="number" name="age" class="form-control" id="age">
+							<input value="<?=$age; ?>" type="number" name="age" class="form-control" id="age">
 						</div>
 						<div class="form-group">
 							<label for="profession">Profession : </label>
-							<input type="text" name="profession" class="form-control" id="profession">
+							<input value="<?=$profession; ?>" type="text" name="profession" class="form-control" id="profession">
 						</div>
-						<button class="btn btn-success pull-center">Enter</button>
+						<button name="<?php if( isset($_GET['action']) && $_GET['action']=='edit' ){echo 'edit';}else{echo 'add';} ?>" type="submit" class="btn btn-success pull-center"><?=(isset($_GET['action']) && $_GET['action'] == 'edit')?'Edit':'Add' ?></button>
+						<?php if(isset($_GET['action']) && !empty($_GET['action'])) : ?>
+						<a href="index.php"><button type="button" class="btn btn-default">Cancel</button></a>
+						<?php endif; ?>
 					</form>
 				</div>
 				<div class="myData col-md-6 pull-right">
@@ -72,8 +106,8 @@ if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
 								<td><?php echo $person['age']; ?></td>
 								<td><?php echo $person['profession']; ?></td>
 								<td>
-									<a href="<?php echo $person['id']; ?>"><button class="btn btn-default">Edit</button></a>
-									<a href="<?php echo $person['id']; ?>"><button class="btn btn-default">Delete</button></a>
+									<a href="index.php?action=edit&id=<?php echo $person['id']; ?>"><button class="btn btn-default">Edit</button></a>
+									<a href="index.php?action=del&id=<?php echo $person['id']; ?>"><button class="btn btn-default">Delete</button></a>
 								</td>
 							</tr>
 						<?php endforeach; ?>
